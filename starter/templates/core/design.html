@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Design reference{% endblock %}
+
+{% block content %}
+<div class="ch-head">
+    <div>
+        <h1>Design reference</h1>
+        <p class="ch-meta">Every component in the kit, rendered by the real templates, tokens and CSS. If it is not here, it is not part of the language yet.</p>
+    </div>
+</div>
+
+<section class="ch-panel" aria-labelledby="states-h">
+    <header class="ch-panel__bar"><h2 id="states-h" class="ch-label">Status language</h2></header>
+    <div class="ch-panel__body">
+        <p class="ch-meta">Always icon + label + tint, never colour alone. Stale is violet on purpose: orange sat next to red and the two read as one chip. &ldquo;We don&rsquo;t know&rdquo; must never look like &ldquo;it is on fire&rdquo;.</p>
+        <p class="d-flex flex-wrap gap-2">
+            {% status_chip "up" %}{% status_chip "degraded" %}{% status_chip "down" %}{% status_chip "stale" %}
+            {% status_chip "offline" %}{% status_chip "unreach" %}{% status_chip "unknown" %}{% status_chip "warn" %}
+        </p>
+        <p class="d-flex flex-wrap gap-3">
+            <span class="ch-st" data-state="up">{% icon "check-circle-fill" %}Quiet inline form for rows that are fine</span>
+            <span class="ch-tag">neutral tag</span>
+            <span class="ch-count">12</span>
+        </p>
+    </div>
+</section>
+
+<section class="ch-panel" aria-labelledby="notices-h">
+    <header class="ch-panel__bar"><h2 id="notices-h" class="ch-label">Notices (Django messages)</h2></header>
+    <div class="ch-panel__body">
+        <div class="ch-notice" data-state="up" role="status">{% notice_icon "up" %}<span>Success: it worked.</span></div>
+        <div class="ch-notice" data-state="degraded" role="status">{% notice_icon "degraded" %}<span>Warning: it worked, but look at this.</span></div>
+        <div class="ch-notice" data-state="down" role="alert">{% notice_icon "down" %}<span>Error: it did not work.</span></div>
+    </div>
+</section>
+
+<section class="ch-panel" aria-labelledby="controls-h">
+    <header class="ch-panel__bar"><h2 id="controls-h" class="ch-label">Buttons and form controls</h2></header>
+    <div class="ch-panel__body">
+        <p class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-ch">{% icon "arrow-repeat" %}Default</button>
+            <button type="button" class="btn btn-ch btn-ch-primary">{% icon "box-arrow-in-right" %}Primary</button>
+        </p>
+        <div class="ch-field">
+            <label for="demo-text">Text</label>
+            <input id="demo-text" class="ch-input" type="text" placeholder="Hairline border, 3:1 against the surface">
+        </div>
+        <div class="ch-field">
+            <label for="demo-select">Select</label>
+            <select id="demo-select" class="ch-select"><option>First</option><option>Second</option></select>
+        </div>
+    </div>
+</section>
+
+<section class="ch-panel" aria-labelledby="table-h">
+    <header class="ch-panel__bar"><h2 id="table-h" class="ch-label">Data table and meter</h2></header>
+    <div class="ch-tablewrap">
+        <table class="ch-table">
+            <thead><tr><th scope="col">Name</th><th scope="col" class="ch-wide">Kind</th><th scope="col" class="ch-r">Used</th></tr></thead>
+            <tbody>
+                <tr><td><span class="ch-mono">db-main</span><span class="ch-narrow ch-sub">volume</span></td><td class="ch-wide">volume</td><td class="ch-r ch-num">46%{% usage_bar 46 100 %}</td></tr>
+                <tr><td><span class="ch-mono">db-backup</span><span class="ch-narrow ch-sub">volume</span></td><td class="ch-wide">volume</td><td class="ch-r ch-num">120%{% usage_bar 120 100 %}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="ch-panel" aria-labelledby="fold-h">
+    <header class="ch-panel__bar"><h2 id="fold-h" class="ch-label">Fold (a native &lt;details&gt;, no script)</h2></header>
+    <details class="ch-fold">
+        <summary class="p-2"><span class="ch-chev">{% icon "chevron-right" %}</span> Healthy things start collapsed</summary>
+        <div class="ch-panel__body">
+            <ul class="ch-tally"><li>{% icon "check-circle-fill" %}<b>12</b> up</li><li>{% icon "pause-circle" %}<b>1</b> expected offline</li></ul>
+        </div>
+    </details>
+</section>
+
+<section class="ch-panel" aria-labelledby="type-h">
+    <header class="ch-panel__bar"><h2 id="type-h" class="ch-label">Type</h2></header>
+    <div class="ch-panel__body">
+        <dl class="ch-facts">
+            <div><dt>Sans (prose)</dt><dd>IBM Plex Sans 400 / 500 / 600</dd></div>
+            <div><dt>Mono (names, ids, labels)</dt><dd>IBM Plex Mono 400 / 500 / 600</dd></div>
+            <div><dt>Scale</dt><dd>11 / 12 / 13 / 14 / 20 / 28 / 48 px, in rem</dd></div>
+        </dl>
+    </div>
+</section>
+{% endblock %}

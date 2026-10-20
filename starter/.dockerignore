@@ -1,0 +1,16 @@
+# Keep secrets, VCS data and local artifacts out of every image. CI builds from a clean checkout, but a
+# local `docker build` would otherwise bake a developer's .env (dev secrets, DEBUG settings) into the image.
+.git
+.gitignore
+.github
+.env
+.env.*
+!.env.example
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.coverage
+htmlcov
+staticfiles
+db.sqlite3
+.venv

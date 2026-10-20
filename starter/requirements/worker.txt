@@ -1,0 +1,4 @@
+# The default worker: same code as the web container, no extra dependencies.
+# A worker that needs a heavy library gets its OWN file (for example requirements/documents.txt with
+# `-r base.txt` plus that library) and its own queue, and the web image never installs it.
+-r base.txt

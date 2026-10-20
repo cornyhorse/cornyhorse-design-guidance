@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+db.sqlite3
+staticfiles/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+.idea/
+.vscode/
+.DS_Store
