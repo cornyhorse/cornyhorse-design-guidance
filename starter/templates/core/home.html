@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}
+<div class="ch-head">
+    <div>
+        <h1>Overview</h1>
+        <p class="ch-meta">Nothing needs attention. A quiet page is a good page.</p>
+    </div>
+</div>
+
+<section class="ch-panel ch-attn" aria-labelledby="attn-h">
+    <header class="ch-panel__bar">
+        <h2 id="attn-h" class="ch-label">Needs attention <span class="ch-count">0</span></h2>
+    </header>
+    <div class="ch-empty">
+        <p>{% status_chip "up" "All clear" %}</p>
+        <p><b>Top of the page = only what is broken.</b> Healthy things stay collapsed below this line, so the page says nothing when there is nothing to say.</p>
+    </div>
+</section>
+
+<section class="ch-panel" aria-labelledby="worker-h">
+    <header class="ch-panel__bar">
+        <h2 id="worker-h" class="ch-label">Worker</h2>
+    </header>
+    <div class="ch-panel__body">
+        {% if heartbeat %}
+        <p>{% status_chip "up" "Heartbeat" %} <span class="ch-meta">last beat {{ heartbeat_age }} from <span class="ch-mono">{{ heartbeat.source }}</span></span></p>
+        {% else %}
+        <p>{% status_chip "unknown" "No heartbeat yet" %} <span class="ch-meta">Queue one: the web container asks, the worker container answers.</span></p>
+        {% endif %}
+        <form method="post" action="{% url 'heartbeat' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ch">{% icon "arrow-repeat" %}Queue a heartbeat</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

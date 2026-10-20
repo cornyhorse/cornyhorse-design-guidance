@@ -1,0 +1,38 @@
+{% load static ui %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}{% endblock %} | {{ product_name }}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    {# Everything below is served by this site. The theme choice is applied before first paint. #}
+    <script src="{% static 'js/theme.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="ch-app">
+<a class="visually-hidden-focusable" href="#main">Skip to content</a>
+{% include 'includes/_topbar.html' %}
+{% if user.is_authenticated %}
+<details class="ch-fold ch-mnav">
+    <summary><span class="ch-chev">{% icon "chevron-right" %}</span>Menu</summary>
+    <div class="ch-mnav__body">{% include 'includes/_nav.html' %}</div>
+</details>
+<div class="ch-shell">
+    <nav class="ch-rail" aria-label="Primary">{% include 'includes/_nav.html' %}</nav>
+{% endif %}
+    <main id="main" class="ch-main{% if not user.is_authenticated %} ch-main--solo{% endif %}">
+        {% include 'includes/_messages.html' %}
+        {% block content %}{% endblock %}
+    </main>
+{% if user.is_authenticated %}
+</div>
+{% endif %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

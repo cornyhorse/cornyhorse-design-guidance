@@ -1,0 +1,25 @@
+# Tool configuration only. Dependencies live in requirements/*.txt (see DEPENDENCIES.md).
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py"]
+testpaths = ["apps", "tests"]
+addopts = "--tb=short --strict-markers -m 'not integration'"
+cache_dir = "/tmp/.pytest_cache"
+filterwarnings = ["ignore:No directory at:UserWarning"]  # WhiteNoise, before collectstatic has run
+markers = ["integration: needs the real broker and a running worker (make integration)"]
+
+[tool.coverage.run]
+source = ["apps", "config"]
+branch = true
+omit = ["*/migrations/*", "*/tests/*", "*/conftest.py"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]

@@ -1,0 +1,14 @@
+{% load ui %}
+<header class="ch-top">
+    <a class="ch-brand" href="{% url 'home' %}"><span class="ch-brand__mark"><svg class="ch-brand__svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="5.25" height="5.25" fill="currentColor"/><rect x="9.25" y="1.5" width="5.25" height="5.25" fill="none" stroke="currentColor" stroke-width="1.25"/><rect x="1.5" y="9.25" width="5.25" height="5.25" fill="none" stroke="currentColor" stroke-width="1.25"/><rect x="9.25" y="9.25" width="5.25" height="5.25" fill="none" stroke="currentColor" stroke-width="1.25"/></svg></span><span>{{ product_name }}</span></a>
+    <div class="ch-top__r">
+        {% include 'includes/_theme_toggle.html' %}
+        {% if user.is_authenticated %}
+        <span class="ch-meta d-none d-md-inline">{{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ch" aria-label="Sign out" title="Sign out">{% icon "box-arrow-right" %}<span class="d-none d-sm-inline">Sign out</span></button>
+        </form>
+        {% endif %}
+    </div>
+</header>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+<section class="ch-panel ch-auth" aria-labelledby="signin-h">
+    <header class="ch-panel__bar">
+        <h1 id="signin-h" class="ch-label">{% icon "person" %}Sign in</h1>
+    </header>
+    <div class="ch-panel__body">
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            {% if form.non_field_errors %}
+            <div class="ch-notice" data-state="down" role="alert">
+                {% notice_icon "down" %}
+                <span>{% for error in form.non_field_errors %}{{ error }} {% endfor %}</span>
+            </div>
+            {% endif %}
+            <div class="ch-field">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}" class="ch-input" autocomplete="username" autocapitalize="none" autofocus required value="{{ form.username.value|default_if_none:'' }}">
+                {% if form.username.errors %}<ul class="ch-errors">{% for error in form.username.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            <div class="ch-field">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" class="ch-input" autocomplete="current-password" required>
+                {% if form.password.errors %}<ul class="ch-errors">{% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-ch btn-ch-primary justify-content-center">{% icon "box-arrow-in-right" %}Sign in</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

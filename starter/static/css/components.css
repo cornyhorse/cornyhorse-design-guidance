@@ -1,0 +1,252 @@
+/* ==========================================================================
+   Components (shared by every page)
+   Load order: bootstrap.min.css, fonts.css, tokens.css, components.css, app.css
+   Plain HTML + CSS. The only script is the Light/Auto/Dark control (static/js/theme.js).
+
+   Content-Security-Policy: this file and app.css must stay free of anything that needs
+   'unsafe-inline'. No inline style="" attributes anywhere in the templates: a bar that needs
+   a data-driven width is an inline SVG whose <rect> width is an attribute (see .ch-meter).
+   ========================================================================== */
+
+/* ---------- Base --------------------------------------------------------- */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 600;
+  line-height: var(--ch-lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--ch-text-strong);
+  text-wrap: balance;
+}
+p { margin: 0; }
+a { color: var(--ch-accent-text); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { color: var(--ch-accent-hover); }
+:focus-visible { outline: 2px solid var(--ch-focus); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--ch-accent-mark) 35%, transparent); }
+code, .ch-mono { font-family: var(--ch-font-mono); font-size: 0.92em; letter-spacing: 0; }
+code { color: inherit; }
+.ch-num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+.ch-meta { font-size: var(--ch-fs-meta); color: var(--ch-text-2); }
+.ch-muted { color: var(--ch-text-muted); }
+.ch-label {
+  font-family: var(--ch-font-mono);
+  font-size: var(--ch-fs-label);
+  font-weight: 500;
+  letter-spacing: var(--ch-tracking-label);
+  text-transform: uppercase;
+  color: var(--ch-text-2);
+  line-height: 1.2;
+}
+h2.ch-label, h3.ch-label { font-weight: 500; letter-spacing: var(--ch-tracking-label); }
+.visually-hidden-focusable:focus { background: var(--ch-surface); padding: .5rem .75rem; z-index: 2000; }
+
+/* ---------- Icons ---------------------------------------------------------
+   <svg class="bi"><use href=".../sprite.svg#name"/></svg>, drawn from the vendored Bootstrap
+   Icons sprite. Sized in em, coloured by the surrounding text. */
+.bi { width: 1em; height: 1em; fill: currentColor; flex: none; vertical-align: -0.125em; }
+
+/* ---------- Status language --------------------------------------------- */
+/* Any element with data-state gets --st-* so chips, notices and rows share one source. */
+[data-state] {
+  --st-solid: var(--ch-offline-solid); --st-fg: var(--ch-offline-fg);
+  --st-bg: var(--ch-offline-bg);       --st-bd: var(--ch-offline-bd);
+}
+[data-state="up"]       { --st-solid: var(--ch-up-solid);       --st-fg: var(--ch-up-fg);       --st-bg: var(--ch-up-bg);       --st-bd: var(--ch-up-bd); }
+[data-state="degraded"],
+[data-state="warn"]     { --st-solid: var(--ch-degraded-solid); --st-fg: var(--ch-degraded-fg); --st-bg: var(--ch-degraded-bg); --st-bd: var(--ch-degraded-bd); }
+[data-state="down"]     { --st-solid: var(--ch-down-solid);     --st-fg: var(--ch-down-fg);     --st-bg: var(--ch-down-bg);     --st-bd: var(--ch-down-bd); }
+[data-state="stale"]    { --st-solid: var(--ch-stale-solid);    --st-fg: var(--ch-stale-fg);    --st-bg: var(--ch-stale-bg);    --st-bd: var(--ch-stale-bd); }
+[data-state="offline"]  { --st-solid: var(--ch-offline-solid);  --st-fg: var(--ch-offline-fg);  --st-bg: var(--ch-offline-bg);  --st-bd: var(--ch-offline-bd); }
+[data-state="unknown"]  { --st-solid: var(--ch-offline-solid);  --st-fg: var(--ch-offline-fg);  --st-bg: transparent;            --st-bd: var(--ch-control-border); }
+[data-state="unreach"]  { --st-solid: var(--ch-down-solid);     --st-fg: var(--ch-unreach-fg);  --st-bg: var(--ch-unreach-bg);  --st-bd: var(--ch-unreach-bg); }
+
+/* Annunciator chip: rectangular, mono caps, icon + label. */
+.ch-chip {
+  display: inline-flex; align-items: center; gap: .375rem;
+  padding: .1875rem .5rem .1875rem .375rem;
+  border: 1px solid var(--st-bd);
+  border-radius: var(--ch-radius-sm);
+  background: var(--st-bg);
+  color: var(--st-fg);
+  font-family: var(--ch-font-mono);
+  font-size: var(--ch-fs-label);
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.ch-chip .bi { font-size: 1.05em; }
+[data-state="unknown"].ch-chip { border-style: dashed; }
+
+/* Quiet inline state: icon + sentence-case label. For rows that are fine. */
+.ch-st {
+  display: inline-flex; align-items: center; gap: .375rem;
+  color: var(--st-fg); font-size: var(--ch-fs-dense); font-weight: 500; white-space: nowrap;
+}
+
+/* Neutral tag: kinds, access scopes, software tags. Outline only, no state colour. */
+.ch-tag {
+  display: inline-flex; align-items: center; gap: .25rem;
+  padding: .0625rem .375rem;
+  border: 1px solid var(--ch-border-strong);
+  border-radius: var(--ch-radius-sm);
+  color: var(--ch-text-2);
+  font-family: var(--ch-font-mono);
+  font-size: var(--ch-fs-label);
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-decoration: none;
+}
+a.ch-tag:hover { background: var(--ch-surface-3); color: var(--ch-text-strong); border-color: var(--ch-text-2); }
+
+/* ---------- Buttons and the theme control ------------------------------- */
+.btn-ch {
+  --bs-btn-padding-x: .625rem; --bs-btn-padding-y: .1875rem;
+  --bs-btn-font-family: var(--ch-font-sans);
+  --bs-btn-font-size: var(--ch-fs-dense); --bs-btn-font-weight: 500; --bs-btn-line-height: 1.4;
+  --bs-btn-border-radius: var(--ch-radius); --bs-btn-border-width: 1px;
+  --bs-btn-color: var(--ch-text); --bs-btn-bg: transparent; --bs-btn-border-color: var(--ch-control-border);
+  --bs-btn-hover-color: var(--ch-text-strong); --bs-btn-hover-bg: var(--ch-surface-3); --bs-btn-hover-border-color: var(--ch-text-2);
+  --bs-btn-active-color: var(--ch-text-strong); --bs-btn-active-bg: var(--ch-surface-3); --bs-btn-active-border-color: var(--ch-text-2);
+  display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap;
+}
+.btn-ch .bi { font-size: .95em; }
+.btn-ch-primary {
+  --bs-btn-color: var(--ch-accent-btn-text); --bs-btn-bg: var(--ch-accent-btn); --bs-btn-border-color: var(--ch-accent-btn);
+  --bs-btn-hover-color: var(--ch-accent-btn-text); --bs-btn-hover-bg: var(--ch-accent-hover); --bs-btn-hover-border-color: var(--ch-accent-hover);
+  --bs-btn-active-color: var(--ch-accent-btn-text); --bs-btn-active-bg: var(--ch-accent-hover); --bs-btn-active-border-color: var(--ch-accent-hover);
+}
+.btn:focus-visible { outline: 2px solid var(--ch-focus); outline-offset: 2px; box-shadow: none; }
+
+/* Three-way theme control: Light / Auto (follow OS) / Dark. Plain buttons + static/js/theme.js.
+   Without script the buttons could do nothing, so they are not shown. */
+.ch-theme { display: inline-flex; border: 1px solid var(--ch-control-border); border-radius: var(--ch-radius); overflow: hidden; background: var(--ch-surface); }
+@media (scripting: none) { .ch-theme { display: none; } }
+.ch-theme button {
+  display: grid; place-items: center; width: 2rem; height: 1.875rem; padding: 0; border: 0; border-radius: 0;
+  background: transparent; color: var(--ch-text-2); font-size: .9375rem; line-height: 1;
+}
+.ch-theme button + button { border-left: 1px solid var(--ch-border-strong); }
+.ch-theme button:hover { background: var(--ch-surface-2); color: var(--ch-text-strong); }
+.ch-theme button[aria-pressed="true"] { background: var(--ch-surface-3); color: var(--ch-accent-text); box-shadow: inset 0 -2px 0 var(--ch-accent-mark); }
+.ch-theme button:focus-visible { outline-offset: -2px; }
+
+/* Tap targets: 44px on phones and touch screens. */
+@media (pointer: coarse), (max-width: 575.98px) {
+  .ch-fold > summary { min-height: 2.75rem; }
+  .btn-ch { --bs-btn-padding-y: .5rem; --bs-btn-padding-x: .875rem; min-height: 2.75rem; }
+  .ch-theme button { width: 2.75rem; height: 2.5rem; }
+  .ch-brand { min-height: 2.75rem; }
+}
+
+/* ---------- Brand -------------------------------------------------------- */
+.ch-brand { display: inline-flex; align-items: center; gap: .625rem; color: var(--ch-text-strong); text-decoration: none; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+.ch-brand:hover { color: var(--ch-text-strong); }
+/* Mark: a 2x2 annunciator panel with one lamp lit. Inline SVG, inherits colour. */
+.ch-brand__mark {
+  display: grid; place-items: center; width: 1.625rem; height: 1.625rem;
+  background: var(--ch-accent-mark); color: #fff; border-radius: var(--ch-radius-sm);
+}
+.ch-brand__svg { width: 1rem; height: 1rem; display: block; }
+
+/* ---------- Form controls ------------------------------------------------ */
+.ch-field { display: grid; gap: .25rem; min-width: 0; }
+.ch-field > label { font-size: var(--ch-fs-meta); color: var(--ch-text-2); font-weight: 500; }
+.ch-input, .ch-select {
+  display: block; width: 100%; height: 2.25rem; padding: 0 .75rem;
+  background-color: var(--ch-surface-2); color: var(--ch-text);
+  border: 1px solid var(--ch-control-border); border-radius: var(--ch-radius);
+  font: inherit; font-size: var(--ch-fs-body);
+}
+.ch-input::placeholder { color: var(--ch-text-muted); opacity: 1; }
+.ch-input:focus, .ch-select:focus {
+  outline: none; border-color: var(--ch-focus); background-color: var(--ch-surface);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ch-focus) 35%, transparent);
+}
+/* The chevron is two gradients so it follows the text colour in light and dark;
+   Bootstrap's own is a fixed-colour data: image that disappears on a dark surface. */
+.ch-select {
+  appearance: none; -webkit-appearance: none; padding-right: 2rem; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ch-text-2) 50%), linear-gradient(135deg, var(--ch-text-2) 50%, transparent 50%);
+  background-position: calc(100% - 1.0625rem) 50%, calc(100% - .75rem) 50%;
+  background-size: .3125rem .3125rem, .3125rem .3125rem;
+  background-repeat: no-repeat;
+}
+@media (pointer: coarse), (max-width: 575.98px) { .ch-input, .ch-select { height: 2.75rem; font-size: 1rem; } }
+
+.ch-search { position: relative; min-width: 0; }
+.ch-search__ico { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--ch-text-muted); pointer-events: none; font-size: .875rem; }
+.ch-search .ch-input { padding-left: 2.25rem; }
+
+/* ---------- Panels ------------------------------------------------------- */
+.ch-panel { background: var(--ch-surface); border: 1px solid var(--ch-border); border-radius: var(--ch-radius-lg); min-width: 0; }
+.ch-panel__bar { display: flex; align-items: center; gap: .625rem; padding: .5rem .75rem; border-bottom: 1px solid var(--ch-border); background: var(--ch-surface-2); border-radius: var(--ch-radius-lg) var(--ch-radius-lg) 0 0; }
+.ch-panel__bar h2, .ch-panel__bar h3 { display: inline-flex; align-items: center; gap: .5rem; }
+.ch-panel__bar a { display: inline-flex; align-items: center; min-height: 1.5rem; }
+.ch-panel__body { padding: .875rem .75rem; display: grid; gap: .75rem; }
+.ch-count {
+  display: inline-grid; place-items: center; min-width: 1.375rem; padding: 0 .375rem; height: 1.25rem;
+  border-radius: var(--ch-radius-sm); background: var(--ch-surface-3); color: var(--ch-text-strong);
+  font-family: var(--ch-font-mono); font-size: var(--ch-fs-label); font-weight: 600;
+}
+
+/* Native collapse: <details class="ch-fold"><summary>..</summary>..</details> */
+.ch-fold > summary { list-style: none; cursor: pointer; }
+.ch-fold > summary::-webkit-details-marker { display: none; }
+.ch-fold > summary .ch-chev { display: inline-block; transition: transform .12s ease; color: var(--ch-text-muted); }
+.ch-fold[open] > summary .ch-chev { transform: rotate(90deg); }
+.ch-fold > summary:hover { background: var(--ch-surface-2); }
+@media (prefers-reduced-motion: reduce) { .ch-fold > summary .ch-chev { transition: none; } }
+
+/* ---------- Notices (Django messages) ------------------------------------ */
+.ch-notice {
+  display: flex; align-items: flex-start; gap: .625rem; padding: .625rem .75rem;
+  border: 1px solid var(--st-bd); border-radius: var(--ch-radius); background: var(--st-bg);
+  color: var(--ch-text); font-size: var(--ch-fs-dense);
+}
+.ch-notice > .bi { color: var(--st-fg); margin-top: .125rem; font-size: 1rem; }
+
+/* ---------- Data tables -------------------------------------------------- */
+/* Real <table>s in a container-query wrapper. Secondary columns carry .ch-wide and appear when
+   the wrapper is wide enough; below that their content moves under the primary cell as .ch-narrow. */
+.ch-tablewrap { container-type: inline-size; container-name: tbl; position: relative; overflow-x: auto; overflow-y: hidden; }
+.ch-table { width: 100%; border-collapse: collapse; font-size: var(--ch-fs-dense); }
+.ch-table th {
+  padding: .375rem .75rem; text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--ch-border);
+  font-family: var(--ch-font-mono); font-size: var(--ch-fs-label); font-weight: 500;
+  letter-spacing: var(--ch-tracking-label); text-transform: uppercase; color: var(--ch-text-muted);
+}
+.ch-table td { padding: .5rem .75rem; vertical-align: top; border-bottom: 1px solid var(--ch-border); }
+.ch-table tbody tr:last-child td { border-bottom: 0; }
+.ch-table tbody tr:hover { background: var(--ch-surface-2); }
+.ch-table .ch-r { text-align: right; }
+.ch-table .ch-wide { display: none; }
+.ch-table .ch-sub { display: block; margin-top: .125rem; font-size: var(--ch-fs-meta); color: var(--ch-text-2); }
+@container tbl (min-width: 560px) {
+  .ch-table .ch-wide { display: table-cell; }
+  .ch-table .ch-narrow { display: none; }
+}
+
+/* ---------- Single-value meter -------------------------------------------
+   <svg class="ch-meter" viewBox="0 0 100 4" preserveAspectRatio="none"><rect width="46.4" .../></svg>
+   Built by {% usage_bar %}. The fill width is an SVG attribute, not a style="" attribute, so it
+   passes a strict style-src. */
+.ch-meter { display: block; width: 100%; height: .375rem; border-radius: var(--ch-mark-radius); background: var(--ch-track); overflow: hidden; }
+.ch-meter rect { fill: var(--ch-accent-mark); }
+.ch-meter[data-state="warn"] rect { fill: var(--ch-degraded-solid); }
+
+/* ---------- Tally (counts) ----------------------------------------------- */
+.ch-tally { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
+.ch-tally li { display: inline-flex; align-items: baseline; gap: .375rem; font-size: var(--ch-fs-dense); color: var(--ch-text-2); }
+.ch-tally .bi { color: var(--ch-text-muted); align-self: center; }
+.ch-tally b { font-family: var(--ch-font-mono); font-size: var(--ch-fs-body); color: var(--ch-text-strong); font-weight: 600; }

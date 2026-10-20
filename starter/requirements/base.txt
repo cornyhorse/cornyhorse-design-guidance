@@ -1,0 +1,6 @@
+# Runtime dependencies of the web container. Keep this list short: every line must be justified in
+# DEPENDENCIES.md (a test fails if one is not). Heavy or compiled libraries belong in worker.txt.
+django==6.1.2
+whitenoise==6.12.0
+psycopg[binary]==3.3.6
+celery[redis]==5.6.3

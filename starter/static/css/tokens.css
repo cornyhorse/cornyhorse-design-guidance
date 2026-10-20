@@ -1,0 +1,196 @@
+/* ==========================================================================
+   Design tokens
+   ==========================================================================
+   Load AFTER bootstrap.min.css. Bootstrap CSS only: no Bootstrap JS, no Popper.
+
+   Identity: "instrument panel". Warm graphite neutrals, one azure accent,
+   sharp 2-4px geometry, hairline borders, no shadows or gradients. Data and
+   hostnames are set in IBM Plex Mono, prose in IBM Plex Sans. Status states are
+   rectangular "annunciators": icon + label + tinted fill, never colour alone.
+
+   Colour modes
+   - Every colour token is ONE definition written as light-dark(<light>, <dark>).
+   - Default follows the OS (color-scheme: light dark).
+   - A manual choice sets data-bs-theme="light|dark" on <html>, which pins
+     color-scheme. "Auto" simply removes the attribute. See static/js/theme.js.
+   - light-dark() needs Chrome/Edge 123+, Safari 17.5+, Firefox 120+.
+
+   Fonts: IBM Plex Sans and Plex Mono are self-hosted (static/vendor/fonts, see
+   static/css/fonts.css and static/vendor/README.md). Nothing is fetched from a
+   third party. The fallback stacks below keep the page usable while they load.
+
+   Contrast (measured, not eyeballed, on every pair that is used): body and secondary text >= 7:1; muted text >= 4.5:1; status text on
+   its tinted chip >= 5.6:1 in both modes; marks (uptime ticks, meter fills,
+   control borders) >= 3:1 against the surface they sit on.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- Type ----------------------------------------------------------- */
+  --ch-font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ch-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* One scale, seven steps. rem so user zoom still works. */
+  --ch-fs-label: 0.6875rem;  /* 11  mono caps labels, annunciators      */
+  --ch-fs-meta:  0.75rem;    /* 12  secondary text, units, timestamps   */
+  --ch-fs-dense: 0.8125rem;  /* 13  table cells, dense lists            */
+  --ch-fs-body:  0.875rem;   /* 14  default UI text                     */
+  --ch-fs-title: 1.25rem;    /* 20  page title, panel heading           */
+  --ch-fs-display: 1.75rem;  /* 28  section numbers                     */
+  --ch-fs-hero:  3rem;       /* 48  the single headline number per page */
+  --ch-lh-body: 1.45;
+  --ch-lh-tight: 1.2;
+  --ch-tracking-label: 0.07em;
+
+  /* ---- Geometry ------------------------------------------------------- */
+  --ch-radius-sm: 2px;       /* chips, marks, small controls */
+  --ch-radius:    3px;       /* buttons, inputs, tiles       */
+  --ch-radius-lg: 4px;       /* panels                       */
+  --ch-topbar-h: 3rem;
+
+  /* ---- Surfaces and ink ------------------------------------------------ */
+  --ch-bg:           light-dark(#f1f0ec, #111110);   /* page            */
+  --ch-surface:      light-dark(#fbfaf8, #181817);   /* panels, bars    */
+  --ch-surface-2:    light-dark(#f5f4f0, #1f1f1d);   /* hover, wells    */
+  --ch-surface-3:    light-dark(#ebe9e3, #282826);   /* pressed, active */
+  --ch-border:       light-dark(#dcdad3, #2d2d2a);   /* hairlines       */
+  --ch-border-strong:light-dark(#c3c0b7, #403f3b);
+  --ch-control-border: light-dark(#8a877e, #7a786f); /* inputs, buttons: >= 3:1 */
+  --ch-text:         light-dark(#1a1a18, #ebeae4);
+  --ch-text-strong:  light-dark(#000000, #ffffff);
+  --ch-text-2:       light-dark(#4b4a45, #bab8ae);   /* secondary */
+  --ch-text-muted:   light-dark(#66645c, #928f85);   /* tertiary, still >= 4.8:1 */
+
+  /* ---- Accent (one) ----------------------------------------------------
+     Azure. Links, active nav, focus, capacity fills, sparklines.
+     Never used for status. */
+  --ch-accent-text:  light-dark(#1d62c4, #6da7ec);   /* text/icons on surfaces */
+  --ch-accent-hover: light-dark(#124a9c, #9ec5f4);
+  --ch-accent-mark:  light-dark(#2a78d6, #3987e5);   /* data marks (dataviz blue, slot 1) */
+  --ch-accent-btn:   light-dark(#1d62c4, #6da7ec);
+  --ch-accent-btn-text: light-dark(#ffffff, #0b0b0a);
+  --ch-focus:        light-dark(#1d62c4, #8fbcf5);
+
+  /* ---- Status language -------------------------------------------------
+     Per state: -solid (marks, >= 3:1), -fg (text/icon on the tint, >= 5.6:1),
+     -bg (tint), -bd (hairline). Every use pairs an icon with a label.
+
+       state             icon                         label
+       up                bi-check-circle-fill         Up
+       degraded          bi-exclamation-triangle-fill Degraded
+       down              bi-x-octagon-fill            Down
+       stale             bi-hourglass-split           Stale   (violet, not orange: orange sat 19 degrees
+                                                              from red and the two chips read as one)
+       expected-offline  bi-pause-circle              Expected offline
+       site-unreachable  bi-wifi-off                  Site unreachable
+       unknown           bi-question-circle           Unknown
+       warn (capacity)   bi-pie-chart-fill            e.g. Overcommitted  (uses degraded colours)
+  */
+  --ch-up-solid:       light-dark(#0e9170, #109f7b);   /* green leaning teal: stays apart from red/amber for red-green colour blindness */
+  --ch-up-fg:          light-dark(#005c46, #5fd9b8);
+  --ch-degraded-solid: light-dark(#b27500, #fab219);
+  --ch-degraded-fg:    light-dark(#734400, #fbc548);
+  --ch-down-solid:     light-dark(#d03b3b, #d03b3b);
+  --ch-down-fg:        light-dark(#a31f1f, #ff8f8a);
+  --ch-stale-solid:    light-dark(#7a4fc9, #a283ea);   /* violet: "we don't know", far from red/amber */
+  --ch-stale-fg:       light-dark(#5b30ad, #c4b0f4);
+  --ch-offline-solid:  light-dark(#66645c, #928f85);
+  --ch-offline-fg:     light-dark(#4b4a45, #bab8ae);
+  --ch-unreach-bg:     #c33030;                       /* filled chip, white text: 5.5:1 */
+  --ch-unreach-fg:     #ffffff;
+
+  --ch-up-bg:       color-mix(in srgb, var(--ch-up-solid) 14%, var(--ch-surface));
+  --ch-degraded-bg: color-mix(in srgb, var(--ch-degraded-solid) 14%, var(--ch-surface));
+  --ch-down-bg:     color-mix(in srgb, var(--ch-down-solid) 14%, var(--ch-surface));
+  --ch-stale-bg:    color-mix(in srgb, var(--ch-stale-solid) 14%, var(--ch-surface));
+  --ch-offline-bg:  color-mix(in srgb, var(--ch-offline-solid) 14%, var(--ch-surface));
+  --ch-up-bd:       color-mix(in srgb, var(--ch-up-solid) 45%, var(--ch-surface));
+  --ch-degraded-bd: color-mix(in srgb, var(--ch-degraded-solid) 45%, var(--ch-surface));
+  --ch-down-bd:     color-mix(in srgb, var(--ch-down-solid) 45%, var(--ch-surface));
+  --ch-stale-bd:    color-mix(in srgb, var(--ch-stale-solid) 45%, var(--ch-surface));
+  --ch-offline-bd:  color-mix(in srgb, var(--ch-offline-solid) 45%, var(--ch-surface));
+
+  /* ---- Data ink -------------------------------------------------------- */
+  --ch-viz-1:    var(--ch-accent-mark);
+  --ch-nodata:   light-dark(#85827a, #716f67);        /* no-data day tick: >= 3:1 */
+  --ch-track:    color-mix(in srgb, var(--ch-accent-mark) 14%, var(--ch-surface));
+  /* Capacity ramp, one hue. m1 strongest (in-guest used) .. m3 faintest (allocated). */
+  --ch-m1: light-dark(#184f95, #a3c8f5);   /* 7.8 / 10.3 : 1 on surface */
+  --ch-m2: light-dark(#2e6ec1, #5b9be8);   /* 4.9 / 6.2 : 1 */
+  --ch-m3: light-dark(#4a8fe6, #2d6fc7);   /* 3.2 / 3.6 : 1 (was 2.0 / 2.7, below the mark floor) */
+  --ch-mark-radius: 2px;
+
+  /* ---- Bridge to Bootstrap 5.3 (--bs-*) -------------------------------- */
+  --bs-body-font-family: var(--ch-font-sans);
+  --bs-body-font-size: var(--ch-fs-body);
+  --bs-body-line-height: var(--ch-lh-body);
+  --bs-body-color: var(--ch-text);
+  --bs-body-bg: var(--ch-bg);
+  --bs-emphasis-color: var(--ch-text-strong);
+  --bs-heading-color: var(--ch-text-strong);
+  --bs-secondary-color: var(--ch-text-2);
+  --bs-secondary-bg: var(--ch-surface-2);
+  --bs-tertiary-color: var(--ch-text-muted);
+  --bs-tertiary-bg: var(--ch-surface-2);
+  --bs-border-color: var(--ch-border);
+  --bs-border-color-translucent: var(--ch-border);
+  --bs-border-radius: var(--ch-radius);
+  --bs-border-radius-sm: var(--ch-radius-sm);
+  --bs-border-radius-lg: var(--ch-radius-lg);
+  --bs-border-radius-xl: var(--ch-radius-lg);
+  --bs-link-color: var(--ch-accent-text);
+  --bs-link-hover-color: var(--ch-accent-hover);
+  --bs-primary: var(--ch-accent-btn);
+  --bs-success: var(--ch-up-solid);
+  --bs-warning: var(--ch-degraded-solid);
+  --bs-danger: var(--ch-down-solid);
+  --bs-success-text-emphasis: var(--ch-up-fg);
+  --bs-warning-text-emphasis: var(--ch-degraded-fg);
+  --bs-danger-text-emphasis: var(--ch-down-fg);
+  --bs-success-bg-subtle: var(--ch-up-bg);
+  --bs-warning-bg-subtle: var(--ch-degraded-bg);
+  --bs-danger-bg-subtle: var(--ch-down-bg);
+  --bs-success-border-subtle: var(--ch-up-bd);
+  --bs-warning-border-subtle: var(--ch-degraded-bd);
+  --bs-danger-border-subtle: var(--ch-down-bd);
+  --bs-focus-ring-color: color-mix(in srgb, var(--ch-focus) 40%, transparent);
+}
+
+/* A manual choice pins the scheme; no attribute = follow the OS. */
+:root[data-bs-theme="light"] { color-scheme: light; }
+:root[data-bs-theme="dark"]  { color-scheme: dark; }
+
+/* Bootstrap still reads a few colours as "r, g, b" triplets (rgba(var(--bs-*-rgb))),
+   and light-dark() cannot produce a triplet, so these are the only values written
+   out per mode. Everything this kit styles itself uses the --ch-* tokens above and
+   avoids Bootstrap's .bg-*, .text-* and .link-* colour utilities. */
+:root {
+  --bs-body-color-rgb: 26, 26, 24;
+  --bs-body-bg-rgb: 241, 240, 236;
+  --bs-emphasis-color-rgb: 0, 0, 0;
+  --bs-secondary-bg-rgb: 245, 244, 240;
+  --bs-tertiary-bg-rgb: 245, 244, 240;
+  --bs-primary-rgb: 29, 98, 196;
+  --bs-link-color-rgb: 29, 98, 196;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme="light"]) {
+    --bs-body-color-rgb: 235, 234, 228;
+    --bs-body-bg-rgb: 17, 17, 16;
+    --bs-emphasis-color-rgb: 255, 255, 255;
+    --bs-secondary-bg-rgb: 31, 31, 29;
+    --bs-tertiary-bg-rgb: 31, 31, 29;
+    --bs-primary-rgb: 109, 167, 236;
+    --bs-link-color-rgb: 109, 167, 236;
+  }
+}
+:root[data-bs-theme="dark"] {
+  --bs-body-color-rgb: 235, 234, 228;
+  --bs-body-bg-rgb: 17, 17, 16;
+  --bs-emphasis-color-rgb: 255, 255, 255;
+  --bs-secondary-bg-rgb: 31, 31, 29;
+  --bs-tertiary-bg-rgb: 31, 31, 29;
+  --bs-primary-rgb: 109, 167, 236;
+  --bs-link-color-rgb: 109, 167, 236;
+}

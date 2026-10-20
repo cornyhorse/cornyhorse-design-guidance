@@ -1,0 +1,49 @@
+# Local development stack. Everything binds to 127.0.0.1 only.
+# Production compose files differ: no source bind mount, `target: web`, secrets as files. See docs/workflow.md.
+x-app: &app
+  env_file: .env
+  volumes:
+    - ".:/app"
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_started
+
+services:
+  web:
+    <<: *app
+    build: {context: ., target: web}
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports: ["127.0.0.1:8000:8000"]
+
+  worker:
+    <<: *app
+    build: {context: ., target: worker}
+    # One worker per queue. Add another service (own requirements file, own --queues) for heavy
+    # libraries or non-Python binaries; see docs/architecture.md.
+    command: celery -A config worker --loglevel=info --queues=default
+
+  test:
+    <<: *app
+    build: {context: ., target: test}
+    profiles: ["test"]  # not started by `docker compose up`; run with `make test`
+    environment:
+      COVERAGE_FILE: /tmp/.coverage
+
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  db_data:

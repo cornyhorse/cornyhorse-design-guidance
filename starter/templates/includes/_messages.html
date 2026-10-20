@@ -1,0 +1,7 @@
+{% load ui %}
+{% if messages %}
+    {% for message in messages %}
+        {% notice_state message.level_tag as state %}
+        <div class="ch-notice" data-state="{{ state }}" role="{% if state == 'down' %}alert{% else %}status{% endif %}">{% notice_icon state %}<span>{{ message }}</span></div>
+    {% endfor %}
+{% endif %}
