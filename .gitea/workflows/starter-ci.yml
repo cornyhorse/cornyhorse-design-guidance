@@ -1,0 +1,77 @@
+# Gitea Actions port of .github/workflows/starter-ci.yml. The Gitea runner's jobs have no Docker daemon, so the original's
+# `docker compose` steps cannot run. What differs from the GitHub original:
+#   - Postgres and Redis are `services:` of the job (the same images as the starter's docker-compose.yml), reached by their service
+#     names, with no `ports:` mapping. The environment is the starter's .env.example with those host names.
+#   - The unit tests run directly on the runner's Python 3.14 (the Dockerfile's base image is also 3.14) instead of in the `test` image.
+#   - The integration test starts the Celery worker as a background process in the job instead of as a compose service.
+#   - NOT ported: the `docker build --target web` step. A stand-in installs the web image's requirements into a clean virtualenv and runs
+#     the same `collectstatic` the image build runs, which catches the same breakages in the Python side of the build, but not a mistake
+#     in the Dockerfile itself.
+# No secrets are used, so it is safe on pull_request (including forks).
+name: Starter CI
+
+# Keeps the starter honest: the guidance in this repo is only worth anything if the code that goes with it
+# still builds, passes its own guard tests, and stays at 100% coverage.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: starter
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: starter
+          POSTGRES_USER: starter
+          POSTGRES_PASSWORD: starter
+        options: >-
+          --health-cmd "pg_isready -U starter -d starter"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+    env:
+      # starter/.env.example, with the service names of this job
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      SECRET_KEY: unsafe-dev-secret-change-me
+      SITE_NAME: Starter
+      DATABASE_URL: postgres://starter:starter@postgres:5432/starter
+      CELERY_BROKER_URL: redis://redis:6379/0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.14"
+
+      - name: Install the test requirements
+        run: pip install -r requirements/test.txt
+
+      - name: Unit tests with coverage (fail_under = 100)
+        run: pytest --cov --cov-report=term-missing
+
+      # Real broker, real worker process, real database.
+      - name: Integration tests
+        run: |
+          python3 manage.py migrate
+          celery -A config worker --loglevel=info --queues=default > "$RUNNER_TEMP/worker.log" 2>&1 &
+          worker=$!
+          trap 'kill "$worker" 2>/dev/null || true' EXIT
+          pytest -m integration
+
+      - name: Production web image's Python build (stand-in for `docker build --target web`)
+        run: |
+          python -m venv "$RUNNER_TEMP/web-venv"
+          "$RUNNER_TEMP/web-venv/bin/pip" install -r requirements/prod.txt
+          SECRET_KEY=build-only DJANGO_SETTINGS_MODULE=config.settings.prod "$RUNNER_TEMP/web-venv/bin/python" manage.py collectstatic --noinput
+
+      - name: Worker log (on failure)
+        if: failure()
+        run: cat "$RUNNER_TEMP/worker.log"
